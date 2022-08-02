@@ -37,6 +37,12 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:textSize="16dp" />
-
+<Spinner
+    android:id="@+id/spinner"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:background="@drawable/edit_text_bg"
+    android:layout_marginTop="20dp"
+    android:visibility="invisible"/>
 
 </LinearLayout>

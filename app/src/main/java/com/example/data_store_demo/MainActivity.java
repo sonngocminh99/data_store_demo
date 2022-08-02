@@ -64,38 +64,32 @@ public void clear(){
 }
     public void getData(){
         NCMBQuery<NCMBObject> query = new NCMBQuery<>("StudentClass");
-
-
-    query.findInBackground(new FindCallback<NCMBObject>() {
-        @Override
-        public void done(List<NCMBObject> results, NCMBException e) {
-            if (e != null) {
-                Log.d("errorData", e.getMessage());
-                getData();
-            }
-            else {
-                if (results != null) {
-
+        query.findInBackground(new FindCallback<NCMBObject>() {
+            @Override
+            public void done(List<NCMBObject> results, NCMBException e) {
+                if (e != null) {
+                    Log.d("errorData", e.getMessage());
+                    getData();
+                }
+                else {
+                    if (results != null) {
                         for (NCMBObject obj : results) {
                             getStudentInClass(obj.getString("ClassName"));
-
                         }
                         Log.d("Minh", results.size() + "");
                     }
                 }
             }
-    });
+        });
 
     }
     private void getStudentInClass(String className){
 
         NCMBQuery<NCMBObject> query = new NCMBQuery<>(className);
         query.findInBackground(new FindCallback<NCMBObject>() {
-
             @Override
             public void done(List<NCMBObject> results, NCMBException e) {
                 if(e!=null) {Log.d("errorStudent", e.getMessage()+e.getCode());
-                students.clear();
                 getStudentInClass(className);
                 }
                 else {
@@ -159,6 +153,8 @@ public void clear(){
 
                     Toast.makeText(MainActivity.this,
                             "Add success", Toast.LENGTH_LONG).show();
+                    students.clear();
+                    getData();
                 }
             }
         });
@@ -175,13 +171,15 @@ public void clear(){
         query.findInBackground(new FindCallback<NCMBObject>() {
             @Override
             public void done(List<NCMBObject> results, NCMBException e) {
-                if(e!=null) Log.d("errorData", e.getMessage());
+                if(e!=null) {Log.d("errorData", e.getMessage());
+                searchTextChange();}
                 else {
                     if (results != null) {
                         for (NCMBObject obj : results) {
                             findStudent(obj.getString("ClassName"));
 
                         }
+
                         Log.d("Minh", results.size() + "");
                     }
                 }
@@ -198,9 +196,9 @@ public void clear(){
             public void done(List<NCMBObject> results, NCMBException e) {
                 if (e != null) {
                     Log.d("errorFind", e.getMessage());
+                    findStudent(className);
                 }
                 else{
-                    students.clear();
                     for (NCMBObject obj : results) {
                         Student student = new Student();
                         student.setMSSV(obj.getString("MSSV"));
@@ -208,10 +206,14 @@ public void clear(){
                         student.setEmail(obj.getString("Email"));
                         student.setStudentClass(new StudentClass(obj.getClassName()));
                         student.setObjectID(obj.getObjectId());
-                        students.add(student);
+                        if(student != students.get(0))
+                        {   students.clear();
+                            students.add(student);}
                     }
+
                     adapter.notifyDataSetChanged();
                     recyclerView.refreshDrawableState();
+
                 }
             }
         });
