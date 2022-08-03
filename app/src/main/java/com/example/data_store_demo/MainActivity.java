@@ -4,11 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.data_store_demo.Model.Student;
@@ -28,6 +33,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnEditorAction;
 import butterknife.OnTextChanged;
 
 public class MainActivity extends AppCompatActivity implements AddStudentDialog.AddStudentDialogListener {
@@ -37,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements AddStudentDialog.
     @BindView(R.id.rv_student)
     RecyclerView recyclerView;
     @BindView(R.id.search_text)
-    EditText searchText;
+    SearchView searchText;
     List<Student> students;
     StudentRVAdapter adapter;
     @Override
@@ -56,7 +62,24 @@ public class MainActivity extends AppCompatActivity implements AddStudentDialog.
         recyclerView.setAdapter(adapter);
 
         getData();
+        searchText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                in.hideSoftInputFromWindow(searchText.getWindowToken(), 0);
+                return true;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if(s.isEmpty()) {
+                    students.clear();
+                    getData();
+                }else
+                performSearch();
+                return true;
+            }
+        });
     }
 
 public void clear(){
@@ -164,15 +187,15 @@ public void clear(){
         AddStudentDialog dialog = new AddStudentDialog(0);
         dialog.show(MainActivity.this.getSupportFragmentManager(),"add student");
     }
-    @OnTextChanged(R.id.search_text)
-    void searchTextChange(){
 
+
+    private void performSearch(){
         NCMBQuery<NCMBObject> query = new NCMBQuery<>("StudentClass");
         query.findInBackground(new FindCallback<NCMBObject>() {
             @Override
             public void done(List<NCMBObject> results, NCMBException e) {
                 if(e!=null) {Log.d("errorData", e.getMessage());
-                searchTextChange();}
+                    performSearch();}
                 else {
                     if (results != null) {
                         for (NCMBObject obj : results) {
@@ -180,16 +203,15 @@ public void clear(){
 
                         }
 
-                        Log.d("Minh", results.size() + "");
+                        Log.d("MinhSearch", results.size() + "");
                     }
                 }
             }
         });
-
     }
     private void findStudent(String className){
         NCMBQuery query = new NCMBQuery(className);
-        String keyword = searchText.getText().toString();
+        String keyword = searchText.getQuery().toString();
         query.whereEqualTo("MSSV", keyword);
         query.findInBackground(new FindCallback<NCMBObject>() {
             @Override
@@ -198,22 +220,24 @@ public void clear(){
                     Log.d("errorFind", e.getMessage());
                     findStudent(className);
                 }
-                else{
-                    for (NCMBObject obj : results) {
-                        Student student = new Student();
-                        student.setMSSV(obj.getString("MSSV"));
-                        student.setName(obj.getString("Name"));
-                        student.setEmail(obj.getString("Email"));
-                        student.setStudentClass(new StudentClass(obj.getClassName()));
-                        student.setObjectID(obj.getObjectId());
-                        if(student != students.get(0))
-                        {   students.clear();
-                            students.add(student);}
-                    }
-
+                else {
+                        for (NCMBObject obj : results) {
+                            Student student = new Student();
+                            student.setMSSV(obj.getString("MSSV"));
+                            student.setName(obj.getString("Name"));
+                            student.setEmail(obj.getString("Email"));
+                            student.setStudentClass(new StudentClass(obj.getClassName()));
+                            student.setObjectID(obj.getObjectId());
+                            if(students.size()>0){
+                            if (student != students.get(0)) {
+                                students.clear();
+                                students.add(student);
+                            }}else{
+                                students.add(student);
+                            }
+                        }
                     adapter.notifyDataSetChanged();
                     recyclerView.refreshDrawableState();
-
                 }
             }
         });
