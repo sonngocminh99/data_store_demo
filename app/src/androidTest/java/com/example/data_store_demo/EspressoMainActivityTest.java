@@ -74,31 +74,31 @@ public class EspressoMainActivityTest {
 
     }
 
-//    @Test
-//    public void addNewStudentWithInput() throws InterruptedException {
-//        NameGenerator nameGenerator = new NameGenerator();
-//        viBtnAdd.perform(click());
-//        viName.perform(ViewActions.typeText(nameGenerator.getName()));
-//        int randomMSSV = new Random().nextInt((99999999-10000000)+1)+10000000;
-//        String MSSV = Integer.toString(randomMSSV);
-//        viMSSV.perform(ViewActions.typeText(MSSV));
-//        viEmail.perform(ViewActions.typeText("abc@gmail.com"));
-//        onView(withText("ADD")).perform(click());
-//
-//        onView(withText("Add New Student")).check(doesNotExist());
-//        int timeout = 0;
-//        while(timeout < 10000) {
-//            try {
-//                onView(withText(MSSV)).check(matches(isDisplayed()));
-//                break;
-//            } catch (Exception e) {
-//                Thread.sleep(1000L);
-//                timeout += 1000L;
-//            }
-//        }
-//
-//
-//    }
+    @Test
+    public void addNewStudentWithInput() throws InterruptedException {
+        NameGenerator nameGenerator = new NameGenerator();
+        viBtnAdd.perform(click());
+        viName.perform(ViewActions.typeText(nameGenerator.getName()));
+        int randomMSSV = new Random().nextInt((99999999-10000000)+1)+10000000;
+        String MSSV = Integer.toString(randomMSSV);
+        viMSSV.perform(ViewActions.typeText(MSSV));
+        viEmail.perform(ViewActions.typeText("abc@gmail.com"));
+        onView(withText("ADD")).perform(click());
+
+        onView(withText("Add New Student")).check(doesNotExist());
+        int timeout = 0;
+        while(timeout < 10000) {
+            try {
+                onView(withText(MSSV)).check(matches(isDisplayed()));
+                break;
+            } catch (Exception e) {
+                Thread.sleep(1000L);
+                timeout += 1000L;
+            }
+        }
+
+
+    }
 
    @Test
     public void search() throws InterruptedException {

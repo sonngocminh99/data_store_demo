@@ -67,7 +67,7 @@ public class MainActivityRecyclerViewTest {
         ViewAction itemViewAction2 = actionOnItemView(withId(R.id.delete_student), click());
         viRvStudent.perform(RecyclerViewActions.actionOnItemAtPosition(1, itemViewAction2));
 
-        
+
         // Match the text in an item below the fold and check that it's displayed.
 
     }
