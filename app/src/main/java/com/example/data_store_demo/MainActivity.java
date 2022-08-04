@@ -92,6 +92,8 @@ public void clear(){
             public void done(List<NCMBObject> results, NCMBException e) {
                 if (e != null) {
                     Log.d("errorData", e.getMessage());
+                    Log.d("errorData", e.getCode());
+                    e.printStackTrace();
                     getData();
                 }
                 else {
@@ -137,7 +139,7 @@ public void clear(){
     }
     private void editStudent(String objectID,String name,String email,String mssv,String className){
 
-        NCMBObject obj = new NCMBObject("Class_2");
+        NCMBObject obj = new NCMBObject(className);
         try {
             obj.setObjectId(objectID);
             obj.put("MSSV", mssv);
@@ -147,16 +149,17 @@ public void clear(){
             e.printStackTrace();
         }
         Log.d("Edit",obj.getString("MSSV")+"1");
-
+        Log.d("EditObj",obj.getString("objectId")+"1");
         obj.saveInBackground(new DoneCallback() {
             @Override
             public void done(NCMBException e) {
                 if (e != null) {
-
                     Log.d("errorEdit",e.getMessage()+e.getCode());
+                    editStudent(objectID, name, email, mssv, className);
                 } else {
                         students.clear();
                         getData();
+                        return;
                 }
             }
         });

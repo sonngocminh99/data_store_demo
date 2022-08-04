@@ -36,7 +36,6 @@ import butterknife.OnClick;
 
 public class StudentRVAdapter extends RecyclerView.Adapter<StudentRVAdapter.StudentViewHolder> {
     private List<Student> students;
-    private String objectID = "";
 
     public StudentRVAdapter(List<Student> students) {
         this.students = students;
@@ -54,6 +53,7 @@ public class StudentRVAdapter extends RecyclerView.Adapter<StudentRVAdapter.Stud
     public void onBindViewHolder(@NonNull StudentViewHolder holder, int position) {
 
     Student student = students.get(position);
+
     if(student== null) return;
 
     if(position%2 == 0) holder.itemLayout.setBackgroundColor(Color.parseColor("#f2e7e6"));
@@ -62,15 +62,17 @@ public class StudentRVAdapter extends RecyclerView.Adapter<StudentRVAdapter.Stud
     holder.mssvText.setText(student.getMSSV());
     holder.className.setText(student.getStudentClass().getClassName());
     holder.objectID.setText(student.getObjectID());
-    this.objectID = student.getObjectID();
+
+
     holder.editBtn.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            String mssv,name,email,className;
+            String mssv,name,email,className,objectID;
             mssv = holder.mssvText.getText().toString();
             name = holder.nameText.getText().toString();
             email = holder.emailText.getText().toString();
             className = holder.className.getText().toString();
+            objectID = holder.objectID.getText().toString();
             AddStudentDialog dialog = new AddStudentDialog(mssv,name,email,objectID,className,1);
             dialog.show(((MainActivity)view.getContext()).getSupportFragmentManager(), "edit student");
 
@@ -100,9 +102,11 @@ public class StudentRVAdapter extends RecyclerView.Adapter<StudentRVAdapter.Stud
             public void done(NCMBException e) {
                 if(e!=null){
                     Log.d("deleteErro",e.getMessage());
+                    deleteStudent(objectID,className,view);
                 }else{
                     Toast.makeText(view.getContext(),
                             "Delete success", Toast.LENGTH_LONG).show();
+                    return;
                 }
             }
         });
